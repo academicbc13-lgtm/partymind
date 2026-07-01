@@ -25,6 +25,22 @@ Here is how the AI Agent chat interface works for planning:
 ### Dashboard Overview
 ![PartyMind Dashboard](docs/screenshot.png)
 
+### System Architecture Flow
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as React UI (Vite)
+    participant Backend as Node.js (Express)
+    participant Gemini as Google Gemini AI
+
+    User->>Frontend: Sends planning request in chat
+    Frontend->>Backend: POST /api/chat (Message + History)
+    Backend->>Gemini: generateContent() with System Prompt
+    Gemini-->>Backend: Returns tailored response
+    Backend-->>Frontend: JSON { reply: "..." }
+    Frontend-->>User: Displays response & updates UI
+```
+
 ## Tech Stack 💻
 - **Frontend Framework**: React.js with Vite
 - **Styling**: Vanilla CSS (CSS Variables, Flexbox/Grid, Backdrop-filters)
