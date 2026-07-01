@@ -29,7 +29,9 @@ Here is how the AI Agent chat interface works for planning:
 - **Frontend Framework**: React.js with Vite
 - **Styling**: Vanilla CSS (CSS Variables, Flexbox/Grid, Backdrop-filters)
 - **Icons**: Lucide React
-- **Architecture**: Component-based React architecture ready for backend/LLM integration.
+- **Backend Framework**: Node.js with Express
+- **AI Integration**: Google Gemini 2.5 Flash via `@google/genai` SDK
+- **Deployment**: Google Cloud Run (Containerized via Docker)
 
 ## Getting Started 🛠️
 
@@ -38,5 +40,11 @@ To run PartyMind locally:
 1. Clone this repository
 2. Navigate to the project directory: `cd partymind`
 3. Install dependencies: `npm install`
-4. Start the development server: `npm run dev`
-5. Open `http://localhost:5173` in your browser.
+4. Create a `.env` file in the root directory and add your Google Gemini API Key:
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
+5. Start the backend server AND frontend concurrently:
+   - Run the frontend: `npm run dev`
+   - In a separate terminal, run the backend: `npm run dev:server`
+6. Open `http://localhost:5173` in your browser.
