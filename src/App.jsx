@@ -16,22 +16,48 @@ function App() {
   const [messages, setMessages] = useState([
     { role: 'agent', content: 'Namaste! I am PartyMind. I see we are planning a grand birthday party for Samanvi in Belagavi! What theme are we thinking of?' }
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [tasks, setTasks] = useState([
+    { id: 1, text: 'Order customized Birthday Cake', completed: false },
+    { id: 2, text: 'Book Party Hall in Camp, Belagavi', completed: false },
+    { id: 3, text: 'Send Digital Invitations', completed: true },
+    { id: 4, text: 'Finalize Return Gifts', completed: true },
+  ]);
 
-  const handleSend = () => {
-    if (!chatInput.trim()) return;
+  const toggleTask = (id) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const handleSend = async () => {
+    if (!chatInput.trim() || isLoading) return;
     
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: chatInput }]);
-    
-    // Simulate agent response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'agent', 
-        content: `Awesome! Belagavi has some great venues for that theme. Would you like me to shortlist some decorators or look up local bakeries for the cake?` 
-      }]);
-    }, 1000);
-    
+    const userMsg = { role: 'user', content: chatInput };
+    setMessages(prev => [...prev, userMsg]);
     setChatInput('');
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: chatInput,
+          history: messages.map(m => ({ sender: m.role, text: m.content }))
+        })
+      });
+      
+      const data = await response.json();
+      if (data.reply) {
+        setMessages(prev => [...prev, { role: 'agent', content: data.reply }]);
+      } else {
+        setMessages(prev => [...prev, { role: 'agent', content: 'Oops! Something went wrong on my end.' }]);
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'agent', content: 'Could not connect to PartyMind servers.' }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -91,7 +117,7 @@ function App() {
             <h3 style={{ color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <CheckCircle2 size={18} /> Tasks Completed
             </h3>
-            <div className="stat-value">5 <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ 12 Total</span></div>
+            <div className="stat-value">{tasks.filter(t => t.completed).length} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ {tasks.length} Total</span></div>
           </div>
         </div>
 
@@ -129,22 +155,16 @@ function App() {
           {/* Upcoming Tasks */}
           <div className="glass-card">
             <h3 style={{ marginBottom: '1rem' }}>Upcoming Tasks</h3>
-            <div className="task-item">
-              <div className="checkbox"></div>
-              <span>Order customized Birthday Cake</span>
-            </div>
-            <div className="task-item">
-              <div className="checkbox"></div>
-              <span>Book Party Hall in Camp, Belagavi</span>
-            </div>
-            <div className="task-item">
-              <div className="checkbox" style={{ background: 'var(--accent-primary)' }}></div>
-              <span style={{ textDecoration: 'line-through', color: 'var(--text-secondary)' }}>Send Digital Invitations</span>
-            </div>
-            <div className="task-item">
-              <div className="checkbox" style={{ background: 'var(--accent-primary)' }}></div>
-              <span style={{ textDecoration: 'line-through', color: 'var(--text-secondary)' }}>Finalize Return Gifts</span>
-            </div>
+            {tasks.map(task => (
+              <div key={task.id} className="task-item" onClick={() => toggleTask(task.id)} style={{ cursor: 'pointer' }}>
+                <div className="checkbox" style={{ background: task.completed ? 'var(--accent-primary)' : 'transparent' }}>
+                  {task.completed && <CheckCircle2 size={14} color="white" />}
+                </div>
+                <span style={{ textDecoration: task.completed ? 'line-through' : 'none', color: task.completed ? 'var(--text-secondary)' : 'inherit' }}>
+                  {task.text}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </main>

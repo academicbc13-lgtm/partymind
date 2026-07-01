@@ -7,11 +7,15 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
-# Copy the custom Nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+FROM node:22-alpine
+WORKDIR /app
+# Copy package files and install production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
 # Copy the built React app from the build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist ./dist
+# Copy the server file
+COPY server.js ./
 # Cloud Run expects the container to listen on port 8080
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
