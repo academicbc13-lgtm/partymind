@@ -19,8 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Gemini Client
-// Requires GEMINI_API_KEY environment variable
-const ai = new GoogleGenAI();
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 const SYSTEM_INSTRUCTION = `You are PartyMind, an expert AI event planner specialized in Indian events, specifically birthday parties. 
 You are currently planning a birthday party for 'Samanvi' in Belagavi, Karnataka.
