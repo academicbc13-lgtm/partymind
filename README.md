@@ -6,6 +6,12 @@ PartyMind is an AI-powered personal event planner designed to handle the end-to-
 
 This repository features the localized "Indian Birthday Planner" MVP, currently customized for **Samanvi's Birthday Bash in Belagavi, Karnataka**.
 
+## The Problem
+Planning a large-scale event, especially with cultural nuances, is highly stressful, fragmented, and time-consuming. Users must juggle multiple vendors, manage a strict budget, and keep track of endless checklists without a centralized system. Generic task-managers lack the domain-specific intelligence needed to actively assist with event planning, leaving the cognitive load entirely on the host.
+
+## The Solution
+**PartyMind** solves this by acting as a proactive, conversational AI Event Architect. By leveraging generative AI (Google Gemini), it provides dynamic, culturally-aware suggestions, instant itinerary planning, and budget estimations. It transforms the user experience from passive data entry into an interactive, guided planning journey wrapped in a premium, highly interactive UI.
+
 ## Features 🚀
 
 - **AI Event Architect (The Agent)**: A conversational interface to brainstorm ideas, get suggestions, and build a cohesive event plan.

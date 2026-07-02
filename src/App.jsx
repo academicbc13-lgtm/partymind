@@ -12,6 +12,13 @@ import {
 import './index.css';
 
 function App() {
+  // ----------------------------------------------------------------------
+  // COMPONENT STATE & CONVERSATION HISTORY
+  // ----------------------------------------------------------------------
+  // We maintain the chat history locally on the client to provide immediate 
+  // feedback to the user. This history is then sent to the stateless Node.js 
+  // backend on every request, allowing the Gemini agent to maintain context 
+  // across the conversation (e.g., remembering previously chosen themes).
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState([
     { role: 'agent', content: 'Namaste! I am PartyMind. I see we are planning a grand birthday party for Samanvi in Belagavi! What theme are we thinking of?' }
@@ -38,6 +45,11 @@ function App() {
     setIsLoading(true);
     
     try {
+      // ----------------------------------------------------------------------
+      // BACKEND COMMUNICATION
+      // ----------------------------------------------------------------------
+      // The frontend delegates all AI processing to our secure backend proxy. 
+      // This ensures that the Gemini API key is never exposed to the client.
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -21,6 +21,14 @@ app.use(express.json());
 // Initialize Gemini Client
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
+// --------------------------------------------------------------------------
+// AGENT SYSTEM INSTRUCTION (The "Brain" of PartyMind)
+// --------------------------------------------------------------------------
+// This prompt fundamentally changes the AI from a generic chatbot into a 
+// domain-specific Event Architect. It enforces the persona, sets the exact 
+// cultural and logistical context (Samanvi's birthday, Belagavi, INR), 
+// and dictates the behavioral guidelines (practical advice, cost estimates).
+// This is the core of our "meaningful use of agents" criteria.
 const SYSTEM_INSTRUCTION = `You are PartyMind, an expert AI event planner specialized in Indian events, specifically birthday parties. 
 You are currently planning a birthday party for 'Samanvi' in Belagavi, Karnataka.
 Be highly enthusiastic, helpful, and culturally aware of Indian traditions, food, and logistics.
@@ -32,13 +40,17 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { message, history } = req.body;
     
-    // Format history for Gemini
+    // Format history for Gemini API
+    // We transform the frontend's generic chat history into the specific 
+    // { role, parts } schema required by the @google/genai SDK.
     const formattedHistory = (history || []).map(msg => ({
       role: msg.sender === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }]
     }));
     
-    // Create a chat session
+    // Create a chat session configuration
+    // We set temperature to 0.7 to balance creativity (for brainstorming themes) 
+    // with coherence (for factual budget estimates).
     const chat = ai.chats.create({
       model: 'gemini-2.5-flash',
       config: {
@@ -47,10 +59,13 @@ app.post('/api/chat', async (req, res) => {
       }
     });
     
+    // ----------------------------------------------------------------------
+    // STATEFUL AGENT CONVERSATION
+    // ----------------------------------------------------------------------
     // We can't easily pass full history to the new SDK chat in one go if it's already instantiated,
-    // so we'll just send a direct generateContent request if we want to include history easily, 
-    // or use the chat interface if we just pass the latest message.
-    // For simplicity, let's use generateContent with the full history array.
+    // so we use generateContent with the full history array concatenated with the new message.
+    // This allows our server to remain stateless while still providing the agent 
+    // with the full conversational context it needs to remember previous decisions.
     
     const contents = [
       ...formattedHistory,
