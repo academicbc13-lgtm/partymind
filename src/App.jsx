@@ -24,6 +24,7 @@ function App() {
     { role: 'agent', content: 'Namaste! I am PartyMind. I see we are planning a grand birthday party for Samanvi in Belagavi! What theme are we thinking of?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
   
   const [tasks, setTasks] = useState([
     { id: 1, text: 'Order customized Birthday Cake', completed: false },
@@ -82,19 +83,19 @@ function App() {
         </div>
         
         <ul className="nav-menu">
-          <li className="nav-item active">
+          <li className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
             <LayoutDashboard size={20} />
             Dashboard
           </li>
-          <li className="nav-item">
+          <li className={`nav-item ${activeTab === 'ai_planner' ? 'active' : ''}`} onClick={() => setActiveTab('ai_planner')}>
             <MessageSquare size={20} />
             AI Planner
           </li>
-          <li className="nav-item">
+          <li className={`nav-item ${activeTab === 'itinerary' ? 'active' : ''}`} onClick={() => setActiveTab('itinerary')}>
             <CalendarDays size={20} />
             Itinerary
           </li>
-          <li className="nav-item">
+          <li className={`nav-item ${activeTab === 'guest_list' ? 'active' : ''}`} onClick={() => setActiveTab('guest_list')}>
             <Users size={20} />
             Guest List
           </li>
@@ -116,69 +117,92 @@ function App() {
           </div>
         </div>
 
-        {/* Top Widgets */}
-        <div className="dashboard-grid">
-          <div className="glass-card">
-            <h3 style={{ color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <Users size={18} /> Confirmed Guests
-            </h3>
-            <div className="stat-value">45 <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ 60 Invited</span></div>
-          </div>
-          
-          <div className="glass-card">
-            <h3 style={{ color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <CheckCircle2 size={18} /> Tasks Completed
-            </h3>
-            <div className="stat-value">{tasks.filter(t => t.completed).length} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ {tasks.length} Total</span></div>
-          </div>
-        </div>
-
-        {/* AI & Tasks Section */}
-        <div className="ai-section">
-          {/* AI Chat */}
-          <div className="glass-card chat-box">
-            <h3 style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <Sparkles size={18} color="var(--accent-primary)" /> Plan with PartyMind
-            </h3>
-            
-            <div className="chat-messages">
-              {messages.map((msg, idx) => (
-                <div key={idx} className={`message ${msg.role}`}>
-                  {msg.content}
-                </div>
-              ))}
-            </div>
-            
-            <div className="chat-input-container">
-              <input 
-                type="text" 
-                className="chat-input" 
-                placeholder="Ask for ideas (e.g. Best cake shop in Belagavi...)"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              />
-              <button className="send-btn" onClick={handleSend}>
-                <Send size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Upcoming Tasks */}
-          <div className="glass-card">
-            <h3 style={{ marginBottom: '1rem' }}>Upcoming Tasks</h3>
-            {tasks.map(task => (
-              <div key={task.id} className="task-item" onClick={() => toggleTask(task.id)} style={{ cursor: 'pointer' }}>
-                <div className="checkbox" style={{ background: task.completed ? 'var(--accent-primary)' : 'transparent' }}>
-                  {task.completed && <CheckCircle2 size={14} color="white" />}
-                </div>
-                <span style={{ textDecoration: task.completed ? 'line-through' : 'none', color: task.completed ? 'var(--text-secondary)' : 'inherit' }}>
-                  {task.text}
-                </span>
+        {/* Main Application View (Conditionally Rendered) */}
+        {(activeTab === 'dashboard' || activeTab === 'ai_planner') && (
+          <>
+            {/* Top Widgets */}
+            <div className="dashboard-grid">
+              <div className="glass-card">
+                <h3 style={{ color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <Users size={18} /> Confirmed Guests
+                </h3>
+                <div className="stat-value">45 <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ 60 Invited</span></div>
               </div>
-            ))}
+              
+              <div className="glass-card">
+                <h3 style={{ color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <CheckCircle2 size={18} /> Tasks Completed
+                </h3>
+                <div className="stat-value">{tasks.filter(t => t.completed).length} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/ {tasks.length} Total</span></div>
+              </div>
+            </div>
+
+            {/* AI & Tasks Section */}
+            <div className="ai-section">
+              {/* AI Chat */}
+              <div className="glass-card chat-box">
+                <h3 style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <Sparkles size={18} color="var(--accent-primary)" /> Plan with PartyMind
+                </h3>
+                
+                <div className="chat-messages">
+                  {messages.map((msg, idx) => (
+                    <div key={idx} className={`message ${msg.role}`}>
+                      {msg.content}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="chat-input-container">
+                  <input 
+                    type="text" 
+                    className="chat-input" 
+                    placeholder="Ask for ideas (e.g. Best cake shop in Belagavi...)"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                  />
+                  <button className="send-btn" onClick={handleSend}>
+                    <Send size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Upcoming Tasks */}
+              <div className="glass-card">
+                <h3 style={{ marginBottom: '1rem' }}>Upcoming Tasks</h3>
+                {tasks.map(task => (
+                  <div key={task.id} className="task-item" onClick={() => toggleTask(task.id)} style={{ cursor: 'pointer' }}>
+                    <div className="checkbox" style={{ background: task.completed ? 'var(--accent-primary)' : 'transparent' }}>
+                      {task.completed && <CheckCircle2 size={14} color="white" />}
+                    </div>
+                    <span style={{ textDecoration: task.completed ? 'line-through' : 'none', color: task.completed ? 'var(--text-secondary)' : 'inherit' }}>
+                      {task.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Placeholders for MVP missing tabs */}
+        {activeTab === 'itinerary' && (
+          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem' }}>
+            <CalendarDays size={48} color="var(--accent-primary)" style={{ margin: '0 auto 1rem' }} />
+            <h2>Itinerary Builder</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>This feature is currently under construction for the MVP.</p>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'guest_list' && (
+          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem' }}>
+            <Users size={48} color="var(--accent-primary)" style={{ margin: '0 auto 1rem' }} />
+            <h2>Guest List Manager</h2>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>This feature is currently under construction for the MVP.</p>
+          </div>
+        )}
+
       </main>
     </div>
   );
