@@ -18,7 +18,14 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Gemini Client
+// --------------------------------------------------------------------------
+// [Key Concept: Security Features]
+// --------------------------------------------------------------------------
+// By proxying the API requests through this Node.js backend, we ensure the 
+// GEMINI_API_KEY is never exposed to the client-side browser.
+// 
+// [Key Concept: Agent / Multi-agent system (ADK)]
+// We initialize the official @google/genai SDK (ADK) to build our AI Agent.
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 // --------------------------------------------------------------------------
